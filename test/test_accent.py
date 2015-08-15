@@ -32,24 +32,46 @@ import json
 class TestAccent(unittest.TestCase):
 
     def test_accent(self):
-        names = TestAccent.get_names('names.json')
-        for name in names:
-            new_name = strip_accent(name, True, True)
-            if name != new_name:
-                print name + " to " + new_name
+        names = TestAccent.get_names('test_data.json')
+        for uni, ascii in names.iteritems():
+            stripped = strip_accent(uni, True, True)
+            self.assertEquals(stripped, ascii)
 
     def test_has_unicode(self):
-        names = TestAccent.get_names('names.json')
-        for name in names:
-            indx = first_unicode(name)
-            if indx > -1:
-                print name + " at " + str(indx)
+        names = TestAccent.get_names('test_data2.json')
+        for uni, loc in names.iteritems():
+            indx = first_unicode(uni)
+            self.assertEquals(loc, indx)
 
-    def test_accent_word(self):
-        name = u'DAŠKO, Mario'
-        new_name = strip_accent(name, True)
-        if name != new_name:
-            print name + " to " + new_name
+    # def test_create_unifile(self):
+    #     output = []
+    #     names = TestAccent.get_names('names.json')
+    #     for name in names:
+    #         new_name = strip_accent(name, True, True)
+    #         if name != new_name:
+    #             output.append(name)
+    #     jdata = json.dumps(output)
+    #     self.write_json('uni_names.json', jdata)
+    #
+    # def test_create_test_file(self):
+    #     output = {}
+    #     names = TestAccent.get_names('uni_names.json')
+    #     for name in names:
+    #         new_name = strip_accent(name, True, True)
+    #         if name != new_name:
+    #             output[name] = new_name
+    #     jdata = json.dumps(output)
+    #     self.write_json('test_data.json', jdata)
+    #
+    # def test_create_test_file2(self):
+    #     output = {}
+    #     names = TestAccent.get_names('uni_names.json')
+    #     for name in names:
+    #         indx = first_unicode(name)
+    #         if indx > -1:
+    #             output[name] = indx
+    #     jdata = json.dumps(output)
+    #     self.write_json('test_data2.json', jdata)
 
     @staticmethod
     def get_names(filename):
@@ -57,6 +79,12 @@ class TestAccent(unittest.TestCase):
             names = json.load(json_data)
             json_data.close()
         return names
+
+    @staticmethod
+    def write_json(filename, text):
+        f = open(filename,'w')
+        f.write(text)
+        f.close()
 
 
 if __name__ == '__main__':
