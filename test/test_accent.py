@@ -34,7 +34,7 @@ class TestAccent(unittest.TestCase):
     def test_accent(self):
         names = TestAccent.get_names('test_data.json')
         for uni, ascii in names.iteritems():
-            stripped = strip_accent(uni, True, True)
+            stripped = strip_accent(uni, True)
             self.assertEquals(stripped, ascii)
 
     def test_has_unicode(self):
@@ -42,6 +42,16 @@ class TestAccent(unittest.TestCase):
         for uni, loc in names.iteritems():
             indx = first_unicode(uni)
             self.assertEquals(loc, indx)
+
+    def test_encode_ascii(self):
+        names = TestAccent.get_names('test_data.json')
+        for uni, ascii in names.iteritems():
+            stripped = encode_ascii(uni)
+            self.assertEquals(stripped, ascii)
+
+    def test_encode_ascii_fail(self):
+        stripped = encode_ascii(u"ABC\u0F04defg")
+        self.assertEquals(stripped, 'ABCdefg')
 
     # def test_create_unifile(self):
     #     output = []
@@ -82,7 +92,7 @@ class TestAccent(unittest.TestCase):
 
     @staticmethod
     def write_json(filename, text):
-        f = open(filename,'w')
+        f = open(filename, 'w')
         f.write(text)
         f.close()
 

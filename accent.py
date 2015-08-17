@@ -25,11 +25,21 @@ __author__ = 'jeff boehmer (ft. collins research, llc)'
 
 
 CAP_LOW = 64
-CAP_HI = 91
-LOW_LOW = 96
-LOW_HI = 123
-ASCII_BOUNDRY = 127
+""" Start ordinal for capital letters """
 
+CAP_HI = 91
+""" Last ordinal for capital letters """
+
+LOW_LOW = 96
+""" Start ordinal for lower case letters """
+
+LOW_HI = 123
+""" Last ordinal for lower case letters """
+
+ASCII_BOUNDRY = 127
+""" Last ordinal for ascii characters """
+
+"""Lookup ordinals and their replacement characters """
 ORDINAL = {
     8305: 'i', 8341: 'h', 8342: 'k', 8343: 'l', 8344: 'm', 8345: 'n', 8346: 'p', 8347: 's', 8348: 't',
     8580: 'c', 192: 'a', 193: 'a', 194: 'a', 195: 'a', 196: 'a', 197: 'a', 199: 'c', 200: 'e', 201: 'e',
@@ -83,7 +93,14 @@ ORDINAL = {
 }
 
 
-def strip_accent(text, match_upper=False, throw_error=False):
+def strip_accent(text, match_case=False, throw_error=False):
+    """
+    Strips all unicode characters from the text string which are in the ORDINAL lookup dict variable
+    :param text: String with unicode characters to strip
+    :param match_case: If True, the method will attempt to maintain upper case character words
+    :param throw_error: If True, the method with raise an error for unicode it cannot replace
+    :return: The passed in text with all unicode alphabet replaced with ascii matches
+    """
     new_word = ""
     indx = 0
     length = len(text)
@@ -94,7 +111,7 @@ def strip_accent(text, match_upper=False, throw_error=False):
         if ordinal > ASCII_BOUNDRY:
             if ordinal in ORDINAL:
                 x = ORDINAL[ordinal]
-                if match_upper and (indx == 0 or (not isletter(text[indx - 1]))):
+                if match_case and (indx == 0 or (not isletter(text[indx - 1]))):
                     x = x.upper()
                 found = True
             elif throw_error:
@@ -103,13 +120,18 @@ def strip_accent(text, match_upper=False, throw_error=False):
         new_word += x
         indx += 1
 
-    if found and match_upper:
+    if found and match_case:
         new_word = upperit(new_word)
 
     return new_word
 
 
 def upperit(text):
+    """
+    Method breaks text in to words and will upper() each if more than one uppercase letter is found
+    :param text: String to scan and upper()
+    :return: The text parameter with words uppercased.
+    """
     start = 0
     cap_count = 0
     indx = 0
@@ -122,29 +144,35 @@ def upperit(text):
         elif LOW_HI > ochar > LOW_LOW:
             pass
         else:
+            new_word += text[start:indx]
             if cap_count > 1:
-                new_word += text[start:indx].upper()
-            else:
-                new_word += text[start:indx]
+                new_word = new_word.upper()
             cap_count = 0
             start = indx
 
         indx += 1
 
+    new_word += text[start:indx]
     if cap_count > 1:
-        new_word += text[start:indx].upper()
-    else:
-        new_word += text[start:indx]
+        new_word = new_word.upper()
 
     return new_word
 
 
 def isletter(char):
+    """
+    :param char: Single character to check
+    :return: Returns True if character is an ascii letter, otherwise False
+    """
     ochar = ord(char)
     return CAP_HI > ochar > CAP_LOW or LOW_HI > ochar > LOW_LOW
 
 
 def first_unicode(text):
+    """
+    :param text: String to scan for any character whose ordinal is above the ascii boundry
+    :return: The position of the first unicode character, otherwise -1
+    """
     indx = 0
     while indx < len(text):
         if ord(text[indx]) > ASCII_BOUNDRY:
@@ -154,6 +182,11 @@ def first_unicode(text):
 
 
 def get_ordinals(char):
+    """
+    Function returns a list of all ORDINAL values whose character match the parameter ascii 'char'
+    :param char: acsii character to scan for
+    :return: List of matching ordinals
+    """
     ords = []
     if char and len(char) == 1:
         lchar = char.lower()
@@ -164,11 +197,25 @@ def get_ordinals(char):
 
 
 def strip_list(nlist):
+    """
+    Strips all unicode from a list of strings
+    :param nlist: The list of strings to strip
+    :return: A new list of stripped strings
+    """
     striped = []
     for name in nlist:
         striped.append(strip_accent(name))
     return striped
 
 
-def encode_ascii(uni):
-    return uni.encode('ascii', 'ignore')
+def encode_ascii(text):
+    """
+    Attempts to strip all unicode characters from text and then encodes as ascii
+    :param text: String to strip and encode to ascii
+    :return: Stripped and ascii encode string
+
+    WARNING: this function will attempt to maintain case,
+            will not raise error if unmatched unicode is found but
+            should merely removed the character from the string
+    """
+    return strip_accent(text, True, False).encode('ascii', 'ignore')
