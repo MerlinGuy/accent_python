@@ -1,9 +1,50 @@
 # accent_python
-Python scripts for removing unicode accents from test.  The intention is to develop python code that works like the Apache Commons command stripAccents
+Python scripts for removing unicode accents from text.  The intention is to develop python code 
+that works like the Apache Commons command **stripAccents()**
 
 
-## File
-### accent.py
+---
+
+##Files (Python)
+
+###accent.py
+    
+    Contains all the methods for stripping accents from text.  Also has a number of helper methods
+    
+### name.py
+    
+    Contains some experimental code for comparing names between stripped and non-stipped data.
+    
+### test/test_accent.py
+
+    Contains a few unittests for running basic tests against accent.py
+     
+     
+---
+
+## Files (JSON)
+
+###uni_names.json
+    
+    Test data file containing procycling riders whose names include unicode characters
+    
+### names.json
+
+    Test data file contiaining procycling riders some of which include unicode characters
+    
+### test_data.json
+
+    Test data file with both unicode names and their stripped results for testing
+    
+### test_data2.json
+
+    Test data file with names and the location of the first unicode character for 
+    testing **accent.first_unicode(text)** method
+   
+     
+---
+     
+##accent.py
 <br/>
 **def strip_accent(text, match_upper=False, throw_error=False):**
 
